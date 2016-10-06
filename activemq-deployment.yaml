@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: activemq-deployment
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: activemq
+    spec:
+      containers:
+      - name: activemq
+        image: cloud-activemq:1.0.0
+        ports:
+        - containerPort: 8161
+        - containerPort: 61616
+        - containerPort: 5672
+        - containerPort: 61613
+        - containerPort: 1883
+        - containerPort: 61614
