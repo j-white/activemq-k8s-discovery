@@ -4,7 +4,7 @@
   <groupId>ca.jessewhite.activemq</groupId>
   <artifactId>activemq-k8s-discovery</artifactId>
   <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0.0</version>
   <name>activemq-k8s-discovery</name>
   <url>https://github.com/j-white/activemq-k8s-discovery</url>
 
