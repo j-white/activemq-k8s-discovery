@@ -98,48 +98,43 @@ public class KubernetesDiscoveryAgent implements DiscoveryAgent {
         @Override
         public void run() {
             while(running.get()) {
-                Set<String> services = null;
                 try {
                     LOG.info("Enumerating pods with label key: {} label value: {}",
                             podLabelKey, podLabelValue);
-                    services = client.pods().inNamespace(namespace)
+                    final Set<String> availableServices = client.pods().inNamespace(namespace)
                         .withLabel(podLabelKey, podLabelValue)
                         .list().getItems().stream()
                         .map(pod -> String.format(serviceUrlFormat, pod.getStatus().getPodIP()))
                         .collect(Collectors.toSet());
+
+                    // Determine the list of service we need to add
+                    final List<String> servicesToAdd = availableServices.stream()
+                            .filter(svc -> !knownServices.contains(svc))
+                            .collect(Collectors.toList());
+
+                    // Add them
+                    for (String service : servicesToAdd) {
+                        LOG.info("Adding service: {}", service);
+                        listener.onServiceAdd(new SimpleDiscoveryEvent(service));
+                        knownServices.add(service);
+                    }
+
+                    // Determine the list of services we need to remove
+                    final List<String> servicesToRemove = knownServices.stream()
+                            .filter(svc -> !availableServices.contains(svc))
+                            .collect(Collectors.toList());
+
+                    // Remove them
+                    for (String service : servicesToRemove) {
+                        LOG.info("Removing service: {}", service);
+                        listener.onServiceRemove(new SimpleDiscoveryEvent(service));
+                        knownServices.remove(service);
+                    }
                 } catch (RuntimeException e) {
                     LOG.warn("Failed to enumerate the pods. Will try again later.", e);
-                    continue;
                 }
 
-                final Set<String> availableServices = services;
-                LOG.debug("Found services: {}", availableServices);
-
-                // Determine the list of service we need to add
-                final List<String> servicesToAdd = availableServices.stream()
-                        .filter(svc -> !knownServices.contains(svc))
-                        .collect(Collectors.toList());
-
-                // Add them
-                for (String service : servicesToAdd) {
-                    LOG.info("Adding service: {}", service);
-                    listener.onServiceAdd(new SimpleDiscoveryEvent(service));
-                    knownServices.add(service);
-                }
-
-                // Determine the list of services we need to remove
-                final List<String> servicesToRemove = knownServices.stream()
-                        .filter(svc -> !availableServices.contains(svc))
-                        .collect(Collectors.toList());
-
-                // Remove them
-                for (String service : servicesToRemove) {
-                    LOG.info("Removing service: {}", service);
-                    listener.onServiceRemove(new SimpleDiscoveryEvent(service));
-                    knownServices.remove(service);
-                }
-
-                // Wait before enumerating again
+                // Sleep before trying again
                 synchronized(k8sSleepMutex) {
                     try {
                         k8sSleepMutex.wait(sleepDelay);
