@@ -112,19 +112,22 @@ public class KubernetesDiscoveryAgent implements DiscoveryAgent {
                             .filter(svc -> !knownServices.contains(svc))
                             .collect(Collectors.toList());
 
-                    // Add them
+                    // Determine the list of services we need to remove
+                    final List<String> servicesToRemove = knownServices.stream()
+                            .filter(svc -> !availableServices.contains(svc))
+                            .collect(Collectors.toList());
+
+                    LOG.info("Found {} services: {} to add, and {} to remove.",
+                            availableServices.size(), servicesToAdd.size(), servicesToRemove.size());
+
+                    // Add those that need adding
                     for (String service : servicesToAdd) {
                         LOG.info("Adding service: {}", service);
                         listener.onServiceAdd(new SimpleDiscoveryEvent(service));
                         knownServices.add(service);
                     }
 
-                    // Determine the list of services we need to remove
-                    final List<String> servicesToRemove = knownServices.stream()
-                            .filter(svc -> !availableServices.contains(svc))
-                            .collect(Collectors.toList());
-
-                    // Remove them
+                    // Remove those that need removing
                     for (String service : servicesToRemove) {
                         LOG.info("Removing service: {}", service);
                         listener.onServiceRemove(new SimpleDiscoveryEvent(service));

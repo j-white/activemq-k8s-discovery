@@ -4,17 +4,17 @@
   <groupId>ca.jessewhite.activemq</groupId>
   <artifactId>activemq-k8s-discovery</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.1</version>
+  <version>1.0.2</version>
   <name>activemq-k8s-discovery</name>
   <url>https://github.com/j-white/activemq-k8s-discovery</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>1.8</java.version>
-    <activemq.version>5.14.1</activemq.version>
-    <kubernetes-client.version>1.4.14</kubernetes-client.version>
+    <activemq.version>5.14.4</activemq.version>
+    <kubernetes-client.version>2.2.13</kubernetes-client.version>
     <junit.version>4.12</junit.version>
-    <slf4j.version>1.7.21</slf4j.version>
+    <slf4j.version>1.7.25</slf4j.version>
   </properties>
 
   <dependencies>
@@ -47,7 +47,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.5.1</version>
+        <version>3.6.1</version>
         <configuration>
           <source>${java.version}</source>
           <target>${java.version}</target>
@@ -56,7 +56,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.6</version>
+        <version>3.0.0</version>
         <configuration>
           <!-- get all project dependencies -->
           <descriptorRefs>
