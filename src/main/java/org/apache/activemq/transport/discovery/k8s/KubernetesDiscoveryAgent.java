@@ -16,14 +16,8 @@
  */
 package org.apache.activemq.transport.discovery.k8s;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
-
+import io.fabric8.kubernetes.client.DefaultKubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import org.apache.activemq.command.DiscoveryEvent;
 import org.apache.activemq.thread.TaskRunnerFactory;
 import org.apache.activemq.transport.discovery.DiscoveryAgent;
@@ -31,8 +25,14 @@ import org.apache.activemq.transport.discovery.DiscoveryListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClient;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 /**
  * The KubernetDiscoveryAgent can be used to build a network of brokers with
