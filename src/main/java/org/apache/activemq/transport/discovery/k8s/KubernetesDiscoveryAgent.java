@@ -93,7 +93,7 @@ public class KubernetesDiscoveryAgent implements DiscoveryAgent {
             return "[" + serviceName + ", failed:" + failed + ", connectionFailures:" + connectFailures + "]";
         }
     }
-    
+
     private class KubernetesPodEnumerator implements Runnable {
         @Override
         public void run() {
@@ -104,7 +104,9 @@ public class KubernetesDiscoveryAgent implements DiscoveryAgent {
                     final Set<String> availableServices = client.pods().inNamespace(namespace)
                         .withLabel(podLabelKey, podLabelValue)
                         .list().getItems().stream()
-                        .map(pod -> String.format(serviceUrlFormat, pod.getStatus().getPodIP()))
+                        .map(pod -> pod.getStatus().getPodIP())
+                        .filter(Objects::nonNull)
+                        .map( ip -> String.format(serviceUrlFormat, ip))
                         .collect(Collectors.toSet());
 
                     // Determine the list of service we need to add
