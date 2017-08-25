@@ -16,14 +16,8 @@
  */
 package org.apache.activemq.transport.discovery.k8s;
 
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
-
+import io.fabric8.kubernetes.client.DefaultKubernetesClient;
+import io.fabric8.kubernetes.client.KubernetesClient;
 import org.apache.activemq.command.DiscoveryEvent;
 import org.apache.activemq.thread.TaskRunnerFactory;
 import org.apache.activemq.transport.discovery.DiscoveryAgent;
@@ -31,8 +25,14 @@ import org.apache.activemq.transport.discovery.DiscoveryListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.fabric8.kubernetes.client.DefaultKubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClient;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 /**
  * The KubernetDiscoveryAgent can be used to build a network of brokers with
@@ -93,7 +93,7 @@ public class KubernetesDiscoveryAgent implements DiscoveryAgent {
             return "[" + serviceName + ", failed:" + failed + ", connectionFailures:" + connectFailures + "]";
         }
     }
-    
+
     private class KubernetesPodEnumerator implements Runnable {
         @Override
         public void run() {
@@ -104,7 +104,9 @@ public class KubernetesDiscoveryAgent implements DiscoveryAgent {
                     final Set<String> availableServices = client.pods().inNamespace(namespace)
                         .withLabel(podLabelKey, podLabelValue)
                         .list().getItems().stream()
-                        .map(pod -> String.format(serviceUrlFormat, pod.getStatus().getPodIP()))
+                        .map(pod -> pod.getStatus().getPodIP())
+                        .filter(Objects::nonNull)
+                        .map( ip -> String.format(serviceUrlFormat, ip))
                         .collect(Collectors.toSet());
 
                     // Determine the list of service we need to add
