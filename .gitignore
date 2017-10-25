@@ -10,8 +10,25 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
-/target/
 
-.classpath
+dependency-reduced-pom.xml
+target/
+.idea
+*.iml
+.gradle
+.vertx
+build/
+    
+#Eclipse files
 .project
 .settings
+.classpath
+.metadata
+
+#Backup files
+*~
+lib/
+gradle/
+gradlew
+gradlew.bat
+    
