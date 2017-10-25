@@ -16,6 +16,7 @@
  */
 package org.apache.activemq.transport.discovery.k8s;
 
+import io.fabric8.kubernetes.api.model.ContainerStatus;
 import io.fabric8.kubernetes.api.model.PodCondition;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -99,6 +100,7 @@ public class KubernetesDiscoveryAgent implements DiscoveryAgent {
     private class KubernetesPodEnumerator implements Runnable {
         @Override
         public void run() {
+            LOG.info("Enumeration loop starting");
             while(running.get()) {
                 try {
                     LOG.info("Enumerating pods with label key: {} label value: {}",
@@ -106,6 +108,7 @@ public class KubernetesDiscoveryAgent implements DiscoveryAgent {
                     final Set<String> availableServices = client.pods().inNamespace(namespace)
                         .withLabel(podLabelKey, podLabelValue)
                         .list().getItems().stream()
+                        .filter( pod -> allContainersReady( pod.getStatus().getContainerStatuses()))
                         .filter( pod -> allConditionsOk( pod.getStatus().getConditions()))
                         .map(pod -> pod.getStatus().getPodIP())
                         .filter(Objects::nonNull)
@@ -152,6 +155,16 @@ public class KubernetesDiscoveryAgent implements DiscoveryAgent {
                     }
                 }
             }
+            LOG.info("Enumeration loop finished");
+        }
+
+        private boolean allContainersReady(List<ContainerStatus> containerStatuses) {
+            boolean errorPresent = containerStatuses.stream()
+                    .filter(cs -> !cs.getReady().booleanValue())
+                    .findFirst()
+                    .isPresent();
+
+            return !errorPresent ;
         }
 
         private boolean allConditionsOk(List<PodCondition> conditions) {
