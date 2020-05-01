@@ -4,17 +4,17 @@
   <groupId>ca.jessewhite.activemq</groupId>
   <artifactId>activemq-k8s-discovery</artifactId>
   <packaging>jar</packaging>
-  <version>1.0.2</version>
+  <version>1.0.3-SNAPSHOT</version>
   <name>activemq-k8s-discovery</name>
   <url>https://github.com/j-white/activemq-k8s-discovery</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>1.8</java.version>
-    <activemq.version>5.14.5</activemq.version>
-    <kubernetes-client.version>2.6.3</kubernetes-client.version>
+    <activemq.version>5.15.12</activemq.version>
+    <kubernetes-client.version>4.9.1</kubernetes-client.version>
     <junit.version>4.12</junit.version>
-    <slf4j.version>1.7.25</slf4j.version>
+    <slf4j.version>1.7.30</slf4j.version>
   </properties>
 
   <dependencies>
